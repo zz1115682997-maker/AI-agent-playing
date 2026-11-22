@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>夜市 · 拿手抽签</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #111;
+      color: #f4f1ea;
+      font-family: "Microsoft YaHei", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    main {
+      width: min(640px, 92vw);
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 8px;
+    }
+    p {
+      margin: 0 0 24px;
+      color: #b9b3a7;
+    }
+    button {
+      font: inherit;
+      font-size: 22px;
+      padding: 12px 36px;
+      border: 0;
+      border-radius: 8px;
+      background: #e8a317;
+      color: #1a1a1a;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #3a3a3a;
+      color: #9a9a9a;
+      cursor: default;
+    }
+    table {
+      width: 100%;
+      margin-top: 28px;
+      border-collapse: collapse;
+      font-size: 22px;
+    }
+    th, td {
+      text-align: left;
+      padding: 12px 8px;
+      border-bottom: 1px solid #333;
+    }
+    th {
+      color: #b9b3a7;
+      font-weight: 500;
+      font-size: 16px;
+    }
+    .time {
+      margin-top: 18px;
+      color: #b9b3a7;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>夜市 · 拿手抽签</h1>
+    <p>四张签只抽一次。点开始之后不能重抽。</p>
+    <button id="go" type="button">开始</button>
+    <table id="out" hidden>
+      <thead>
+        <tr><th>顺序</th><th>选手</th><th>抽到</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <p id="when" class="time" hidden></p>
+  </main>
+  <script>
+    const players = ["Cursor / Grok", "Codex", "WorkBuddy", "DSH"];
+    const skills = ["手艺", "嘴皮", "吃食", "眼力"];
+
+    function shuffle(list) {
+      const a = list.slice();
+      const buf = new Uint32Array(a.length);
+      crypto.getRandomValues(buf);
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = buf[i] % (i + 1);
+        const t = a[i];
+        a[i] = a[j];
+        a[j] = t;
+      }
+      return a;
+    }
+
+    document.getElementById("go").addEventListener("click", () => {
+      const button = document.getElementById("go");
+      button.disabled = true;
+      const drawn = shuffle(skills);
+      const body = document.querySelector("#out tbody");
+      drawn.forEach((skill, i) => {
+        const row = document.createElement("tr");
+        row.innerHTML = "<td>" + (i + 1) + "</td><td>" + players[i] + "</td><td>" + skill + "</td>";
+        body.appendChild(row);
+      });
+      document.getElementById("out").hidden = false;
+      const now = new Date();
+      const stamp = now.getFullYear() + "-" +
+        String(now.getMonth() + 1).padStart(2, "0") + "-" +
+        String(now.getDate()).padStart(2, "0") + " " +
+        String(now.getHours()).padStart(2, "0") + ":" +
+        String(now.getMinutes()).padStart(2, "0") + ":" +
+        String(now.getSeconds()).padStart(2, "0");
+      const when = document.getElementById("when");
+      when.hidden = false;
+      when.textContent = "抽出时间 " + stamp;
+    });
+  </script>
+</body>
+</html>
